@@ -104,19 +104,16 @@ services:
     restart: always
 ```
 
-## Some examples
+## Examples
 
-Some edge-cases examples are available on the `examples` folder. You can read more there [examples/README.md](examples/README.md).
+Examples are available in [examples](/examples).
 
-## Authors
-
-* **Itay Hury** - *Initial work* - [1tayH](https://github.com/1tayH)
-* **madereddy**- *Docker build + Python Upgrade*
 
 ## License
 
 This project is licensed under the GNU GPLv3 License - see the [LICENSE.md](LICENSE.md) file for details
 
-## Acknowledgments
+## Authors and Acknowledgments
 
-This project has been inspired by: \[https://github.com/1tayH/noisy] and \[https://github.com/madereddy/noisy]
+* **[Itay Hury](https://github.com/1tayH)** - *Initial work*
+* **[madereddy](https://github.com/madereddy/noisy)** - *Docker build + Python Upgrade*
