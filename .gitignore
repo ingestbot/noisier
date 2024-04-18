@@ -1,0 +1,8 @@
+#folders
+.github
+
+#files
+.idea
+.DS_Store
+*.pyc
+*.md
