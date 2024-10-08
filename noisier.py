@@ -1,3 +1,6 @@
+
+import socket
+from urllib.parse import urlparse
 import argparse
 import datetime
 import json
@@ -8,6 +11,8 @@ import sys
 import time
 
 import requests
+from requests.exceptions import SSLError, RequestException, ReadTimeout
+
 from urllib3.exceptions import LocationParseError
 
 ##
@@ -37,6 +42,9 @@ class Crawler(object):
         self._config = {}
         self._links = []
         self._start_time = None
+        self.count_visit = 0
+        self.count_error = 0
+        self.count_bad_url = 0
 
     class CrawlerTimedOut(Exception):
         """
@@ -54,14 +62,41 @@ class Crawler(object):
         headers = {'user-agent': random_user_agent}
 
         session = requests.Session() 
-        retry = Retry(total=5, connect=3, backoff_factor=0.1)
+
+        retry = Retry(total=3, 
+                    backoff_factor=1,
+                    status_forcelist=[500, 502, 503, 504],
+                    allowed_methods=["HEAD", "GET", "OPTIONS", "POST"]
+                    )
+
         adapter = HTTPAdapter(max_retries=retry)
         session.mount('http://', adapter) 
         session.mount('https://', adapter) 
 
-        response = session.get(url, headers=headers, timeout=3)
+        try:
+            response = session.get(url, headers=headers, timeout=3)
+            response.raise_for_status()
+            return response
 
-        return response
+        except requests.exceptions.HTTPError as e:
+            logging.debug(f"HTTP error for URL {url}: {e}")
+            if response.status_code == 503:
+                logging.debug(f"503 Service Unavailable for URL {url}.")
+            self.count_error += 1
+
+        except requests.exceptions.ReadTimeout:
+            logging.debug(f"Read timeout for URL {url}. Skipping this URL.")
+            self.count_error += 1
+
+        except requests.exceptions.SSLError as e:
+            logging.debug(f"SSL error for URL {url}: {e}")
+            self.count_error += 1
+
+        except requests.exceptions.RequestException as e:
+            logging.debug(f"_request(): Request error for URL {url}: {e}")
+            self.count_error += 1
+
+        return None  # Return None if there's an error
 
     @staticmethod
     def _normalize_link(link, root_url):
@@ -148,6 +183,10 @@ class Crawler(object):
         :param link: link to remove and blacklist
         """
         self._config['blacklisted_urls'].append(link)
+
+        if link not in self._links:
+            self._links.append(link)
+
         del self._links[self._links.index(link)]
 
     def _browse_from_links(self, depth=0):
@@ -158,7 +197,9 @@ class Crawler(object):
         a dead end has reached or when we ran out of links
         :param depth: our current link depth
         """
+
         is_depth_reached = depth >= self._config['max_depth']
+
         if not len(self._links) or is_depth_reached:
             logging.debug("Hit a dead end, moving to the next root URL")
             # escape from the recursion, we don't have links to continue or we have reached the max depth
@@ -168,17 +209,40 @@ class Crawler(object):
             raise self.CrawlerTimedOut
 
         random_link = random.choice(self._links)
+        fqdn = urlparse(random_link).netloc
+
         try:
-            logging.info("Visiting {}".format(random_link))
-            sub_page = self._request(random_link).content
+            ip_address = socket.gethostbyname(fqdn)
+        except socket.gaierror:
+            self._remove_and_blacklist(random_link)
+
+        try:
+            logging.debug("Visiting {}".format(random_link))
+            response = self._request(random_link)
+            logging.debug(f"Response: {response}")
+
+            if response is None:
+                logging.debug(f"Skipping {random_link} due to request failure.")
+                self.count_bad_url += 1
+
+                return
+
+            sub_page = response.content  # Access .content only if response is not None
+
+            self.count_visit += 1
+
             sub_links = self._extract_urls(sub_page, random_link)
+
+            if self.count_visit % 25 == 0:
+                logging.info(f"Successful Visits: {self.count_visit}")
+                logging.info(f"Errors: {self.count_error}")
+                logging.info(f"Invalid URLs: {self.count_bad_url}")
 
             # sleep for a random amount of time
             time.sleep(random.randrange(self._config["min_sleep"], self._config["max_sleep"]))
 
             # make sure we have more than 1 link to pick from
             if len(sub_links) > 1:
-                # extract links from the new page
                 self._links = self._extract_urls(sub_page, random_link)
             else:
                 # else retry with current link list
@@ -188,6 +252,7 @@ class Crawler(object):
         except requests.exceptions.RequestException:
             logging.debug("Exception on URL: %s, removing from list and trying again!" % random_link)
             self._remove_and_blacklist(random_link)
+            self.count_error += 1
 
         self._browse_from_links(depth + 1)
 
@@ -237,27 +302,52 @@ class Crawler(object):
 
     def crawl(self):
         """
-        Collects links from our root urls, stores them and then calls
-        `_browse_from_links` to browse them
+        Collects links from root_urls, stores them, then calls
+        `_browse_from_links` to browse.
         """
+
         self._start_time = datetime.datetime.now()
+        logging.info(f"Time is now: {self._start_time}")
+
+        bad_urls = set()
 
         while True:
             url = random.choice(self._config["root_urls"])
+            fqdn = urlparse(url).netloc
+
+            if url in bad_urls:
+                continue
             try:
-                body = self._request(url).content
+                ip_address = socket.gethostbyname(fqdn)
+            except socket.gaierror:
+                bad_urls.add(url)
+                self.count_bad_url += 1
+                continue
+
+            try:
+                response = self._request(url) 
+                if response is None:
+                    bad_urls.add(url)
+                    self.count_bad_url += 1
+                    continue
+                body = response.content
+
                 self._links = self._extract_urls(body, url)
                 logging.debug("found {} links".format(len(self._links)))
+
                 self._browse_from_links()
 
             except requests.exceptions.RequestException:
                 logging.warning("Error connecting to root url: {}".format(url))
+                self.count_error += 1
                 
             except MemoryError:
                 logging.warning("Error: content at url: {} is exhausting the memory".format(url))
+                self.count_error += 1
 
             except LocationParseError:
                 logging.warning("Error encountered during parsing of: {}".format(url))
+                self.count_error += 1
 
             except self.CrawlerTimedOut:
                 logging.info("Timeout has exceeded, exiting")
@@ -271,10 +361,11 @@ def main():
                         help='for how long the crawler should be running, in seconds', default=False)
     args = parser.parse_args()
 
-    level = getattr(logging, args.log.upper())
+    level = getattr(logging, args.log.upper(), logging.INFO)
+
     logging.basicConfig(
       format='%(asctime)s %(levelname)-8s %(message)s',
-      level=logging.INFO,
+      level=level,
       datefmt='%Y-%m-%d %H:%M:%S')
 
     crawler = Crawler()
@@ -283,8 +374,9 @@ def main():
     if args.timeout:
         crawler.set_option('timeout', args.timeout)
 
-    crawler.crawl()
+    logging.info("Starting Noisier!")
 
+    crawler.crawl()
 
 if __name__ == '__main__':
     main()
