@@ -1,17 +1,15 @@
 
 import socket
-from urllib.parse import urlparse
 import argparse
 import datetime
 import json
-import logging
 import random
 import re
 import sys
 import time
-
 import requests
 from requests.exceptions import SSLError, RequestException, ReadTimeout
+from urllib.parse import urljoin, urlparse
 
 from urllib3.exceptions import LocationParseError
 
@@ -22,16 +20,13 @@ from urllib3.exceptions import LocationParseError
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-try:                 # Python 2
-    from urllib.parse import urljoin, urlparse
-except ImportError:  # Python 3
-    from urlparse import urljoin, urlparse
+import logging
 
-try:                 # Python 2
-    reload(sys)
-    sys.setdefaultencoding('latin-1')
-except NameError:    # Python 3
-    pass
+##
+## This prevents WARNING messages from urllib3 appearing in 
+## default INFO logging. 
+##
+logging.getLogger("urllib3").setLevel(logging.ERROR)
 
 
 class Crawler(object):
@@ -45,6 +40,7 @@ class Crawler(object):
         self.count_visit = 0
         self.count_error = 0
         self.count_bad_url = 0
+        self.kbytes_transferred = 0 
 
     class CrawlerTimedOut(Exception):
         """
@@ -76,6 +72,11 @@ class Crawler(object):
         try:
             response = session.get(url, headers=headers, timeout=3)
             response.raise_for_status()
+
+            content_length = response.headers.get('Content-Length')
+            if content_length is not None:
+                self.kbytes_transferred += int(content_length) / 1024
+
             return response
 
         except requests.exceptions.HTTPError as e:
@@ -237,6 +238,7 @@ class Crawler(object):
                 logging.info(f"Successful Visits: {self.count_visit}")
                 logging.info(f"Errors: {self.count_error}")
                 logging.info(f"Invalid URLs: {self.count_bad_url}")
+                logging.info(f"Total KBytes Transferred: {self.kbytes_transferred:.2f}")
 
             # sleep for a random amount of time
             time.sleep(random.randrange(self._config["min_sleep"], self._config["max_sleep"]))
