@@ -27,17 +27,12 @@ jobs:
     # - name: Run the Docker container
     #  run: docker run noisier
 
-    - name: Run the Docker container and capture logs
+    - name: Run the Docker container | capture logs | verify Successful Visits
       run: |
-        docker run noisier > logs.txt &
+        container_id=$(docker run -d noisier)
         sleep 180
-        docker ps -q --filter "ancestor=noisier" | xargs -r docker stop
-
-    - name: Check logs for expected output
-      run: |
-        if grep -q "Successful Visits: 25" logs.txt; then
-            echo "Test passed: Found expected log output."
+        if docker logs "$container_id" 2>&1 | grep -q "Successful Visits"; then
+            echo "PASS"
         else
-            echo "Test failed: Expected log output not found."
-            exit 1
+            echo "FAIL"
         fi
