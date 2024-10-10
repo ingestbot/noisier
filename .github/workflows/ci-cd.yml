@@ -24,6 +24,20 @@ jobs:
     - name: Build the Docker image
       run: docker build . -t noisier
 
-    - name: Run the Docker container
-      run: docker run noisier
+    # - name: Run the Docker container
+    #  run: docker run noisier
 
+    - name: Run the Docker container and capture logs
+      run: |
+        docker run noisier > logs.txt &
+        sleep 180
+        docker ps -q --filter "ancestor=noisier" | xargs -r docker stop
+
+    - name: Check logs for expected output
+      run: |
+        if grep -q "Successful Visits: 25" logs.txt; then
+            echo "Test passed: Found expected log output."
+        else
+            echo "Test failed: Expected log output not found."
+            exit 1
+        fi
