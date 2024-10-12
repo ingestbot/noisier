@@ -15,7 +15,7 @@ local machine
 
 Install `requests` if you do not have it already installed, using `pip`:
 
-```
+```bash
 pip install requests
 ```
 
@@ -23,25 +23,25 @@ pip install requests
 
 Clone the repository
 
-```
+```bash
 git clone https://github.com/ingestbot/noisier.git
 ```
 
 Navigate into the `noisier` directory
 
-```
+```bash
 cd noisier
 ```
 
 Run the script
 
-```
+```bash
 python noisier.py --config config.json
 ```
 
 The program can accept a number of command line arguments:
 
-```
+```bash
 $ python noisier.py --help
 usage: noisier.py [-h] [--log -l] --config -c [--timeout -t]
 
@@ -58,7 +58,7 @@ only the config file argument is required.
 
 ### Output
 
-```
+```bash
 $ docker run -it noisier --config config.json --log debug
 DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 4chan.org:80
 DEBUG:urllib3.connectionpool:http://4chan.org:80 "GET / HTTP/1.1" 301 None
@@ -88,7 +88,7 @@ DEBUG:urllib3.connectionpool:https://www.reddit.com:443 "GET / HTTP/1.1" 200 Non
 
 1. Use Docker Compose (docker-compose.yml):
 
-```
+```yml
 services:
   noisier:
     image: ingestbot/noisier:latest
