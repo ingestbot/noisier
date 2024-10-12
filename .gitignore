@@ -6,3 +6,6 @@
 .DS_Store
 *.pyc
 *.md
+*.swp
+*.bk
+__pycache__
