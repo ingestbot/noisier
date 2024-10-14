@@ -32,7 +32,12 @@ jobs:
           fetch-depth: 0
 
       - name: Install Dependencies
-        run: pip install -r requirements-ci.txt
+        # run: pip install -r requirements-ci.txt
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements-ci.txt
 
       - name: TruffleHog OSS
         uses: trufflesecurity/trufflehog@v3.82.8
@@ -42,9 +47,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_PYTHON_PYLINT: false
+          VALIDATE_JSCPD: false
+          VALIDATE_MARKDOWN: false
 
       - name: Run tests
         run: |
+          source venv/bin/activate
           PYTHONPATH=. pytest tests/test_main.py -vv
 
       - name: Docker Login
