@@ -1,6 +1,7 @@
 {
   "exclude": [
-    "**/venv/**"
+    "**/venv/**",
+    "**/lib/python*/site-packages/**"
   ],
   "minLines": 5,
   "minTokens": 50
