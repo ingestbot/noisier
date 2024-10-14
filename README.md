@@ -1,5 +1,9 @@
 
 <p align="center">
+    <img alt="noisier mascot" src="https://github.com/ingestbot/noisier/blob/docker_prom_and_readme/noisier_mascot.jpg" width="234">
+</p>
+
+<p align="center">
     &nbsp;<a href="https://github.com/ingestbot/noisier/actions/workflows/ci-cd.yml"><img src="https://github.com/ingestbot/noisier/actions/workflows/ci-cd.yml/badge.svg" alt="cicd status"></a>&nbsp;
     &nbsp;<a href="https://hub.docker.com/r/ingestbot/noisier"><img src="https://img.shields.io/docker/pulls/ingestbot/noisier.svg" alt="noisier docker pulls"></a>&nbsp;
 <p>
@@ -123,9 +127,6 @@ Other projects based on the original noisy, forks of noisy, and similar to noisy
 * https://github.com/Arduous/noisy
 * https://github.com/fireneat/Noisy
 * https://github.com/ReconInfoSec/web-traffic-generator
-
-## License
-
 
 ## License
 
