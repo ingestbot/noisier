@@ -1,6 +1,6 @@
 {
   "exclude": [
-    "venv/**" 
+    "**/venv/**"
   ],
   "minLines": 5,
   "minTokens": 50
