@@ -425,9 +425,7 @@ class Crawler(object):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--prom_port", metavar="-p", type=int, help="prometheus port"
-    )
+    parser.add_argument("--prom_port", metavar="-p", type=int, help="prometheus port")
     parser.add_argument(
         "--log", metavar="-l", type=str, help="logging level", default="info"
     )
@@ -452,7 +450,11 @@ def main():
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    prom_port = args.prom_port if args.prom_port is not None else os.getenv('NOISIER_PROMETHEUS_PORT')
+    prom_port = (
+        args.prom_port
+        if args.prom_port is not None
+        else os.getenv("NOISIER_PROMETHEUS_PORT")
+    )
     if prom_port is not None:
         logging.debug(f"starting prometheus http server on port {prom_port}")
         start_http_server(int(prom_port))
