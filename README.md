@@ -1,4 +1,9 @@
 
+<p align="center">
+    &nbsp;<a href="https://github.com/ingestbot/noisier/actions/workflows/ci-cd.yml"><img src="https://github.com/ingestbot/noisier/actions/workflows/ci-cd.yml/badge.svg" alt="cicd status"></a>&nbsp;
+    &nbsp;<a href="https://hub.docker.com/r/ingestbot/noisier"><img src="https://img.shields.io/docker/pulls/ingestbot/noisier.svg" alt="noisier docker pulls"></a>&nbsp;
+<p>
+
 # Noisier
 
 Simple random DNS, HTTP/S internet traffic noise generator.
@@ -105,12 +110,23 @@ services:
 
 Examples are available in [examples](/examples).
 
-## License
-
-This project is licensed under the GNU GPLv3 License - see the
-[LICENSE.md](LICENSE.md) file for details
 
 ## Authors and Acknowledgments
 
 * **[Itay Hury](https://github.com/1tayH)** - *Initial work*
 * **[madereddy](https://github.com/madereddy/noisy)** - *Docker build + Python Upgrade*
+
+## Other Projects
+
+Other projects based on the original noisy, forks of noisy, and similar to noisy:
+
+* https://github.com/Arduous/noisy
+* https://github.com/fireneat/Noisy
+* https://github.com/ReconInfoSec/web-traffic-generator
+
+## License
+
+
+## License
+
+[![MIT](https://img.shields.io/github/license/ingestbot/noisier)](https://github.com/ingestbot/noisier/blob/master/LICENSE)

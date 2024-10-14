@@ -1,7 +1,28 @@
-version: "3"
-
+##
+## https://github.com/ingestbot/noisier
+##
 services:
-  noisy:
-    build:
-      context: ../../
-    command: --config config.json
+  noisier:
+    image: ingestbot/noisier:latest
+    container_name: noisier
+    network_mode: bridge
+    #
+    # ports are specified as host_port:container_port
+    # NOISIER_PROMETHEUS_PORT as shown below specifies
+    # container_port
+    #
+    # ports:
+    #  - 8090:9111
+    dns:
+      - 192.168.1.25
+      - 192.168.1.10
+    environment:
+      - TZ=America/Los_Angeles
+      - HTTP_PROXY=${http_proxy}
+      - HTTPS_PROXY=${https_proxy}
+      - NO_PROXY=${no_proxy}
+
+    #  - NOISIER_LOG_LEVEL=debug
+    #  - NOISIER_PROMETHEUS_PORT=9115
+
+    restart: always
