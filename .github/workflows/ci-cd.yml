@@ -52,6 +52,7 @@ jobs:
 
       - name: Run tests
         run: |
+          source venv/bin/activate
           PYTHONPATH=. pytest tests/test_main.py -vv
 
       - name: Docker Login
