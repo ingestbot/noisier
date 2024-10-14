@@ -17,7 +17,7 @@ Improvements have been made to the codebase, with future enhancements in mind.
 
 ### Dependencies
 
-See requirements.txt 
+See requirements.txt
 
 ### Usage
 
@@ -52,8 +52,8 @@ options:
   --config -c     config file
   --timeout -t    for how long the crawler should be running, in seconds
 ```
-Note: `--config` is required!!
 
+Note: `--config` is required!!
 
 ### Output
 
@@ -82,7 +82,6 @@ Note: `--config` is required!!
 ## Examples
 
 Examples are available in [examples](/examples).
-
 
 ## Authors and Acknowledgments
 
