@@ -32,7 +32,12 @@ jobs:
           fetch-depth: 0
 
       - name: Install Dependencies
-        run: pip install -r requirements-ci.txt
+        # run: pip install -r requirements-ci.txt
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements-ci.txt
 
       - name: TruffleHog OSS
         uses: trufflesecurity/trufflehog@v3.82.8
