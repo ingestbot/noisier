@@ -1,25 +1,21 @@
-
-<p align="center">
-    <img alt="noisier mascot" src="https://github.com/ingestbot/noisier/blob/docker_prom_and_readme/noisier_mascot.jpg" width="234">
-</p>
-
-<p align="center">
-    &nbsp;<a href="https://github.com/ingestbot/noisier/actions/workflows/ci-cd.yml"><img src="https://github.com/ingestbot/noisier/actions/workflows/ci-cd.yml/badge.svg" alt="cicd status"></a>&nbsp;
-    &nbsp;<a href="https://hub.docker.com/r/ingestbot/noisier"><img src="https://img.shields.io/docker/pulls/ingestbot/noisier.svg" alt="noisier docker pulls"></a>&nbsp;
-<p>
+<div align="center">
+  <img src="./noisier_mascot.jpg" width="234" alt="noisier mascot"/>
 
 # Noisier
 
-Simple random DNS, HTTP/S internet traffic noise generator.
+  A simple random DNS, HTTP/S internet traffic noise generator.
+  <br/><br/>
+  
+  [![Pulls from DockerHub](https://img.shields.io/docker/pulls/ingestbot/noisier.svg)](https://hub.docker.com/r/ingestbot/noisier)
+  [![cicd status](https://github.com/ingestbot/noisier/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/ingestbot/noisier/actions/workflows/ci-cd.yml)
 
-This project is based on the good work of the authors noted below.
-Improvements have been made to the codebase, with future enhancements in mind.
+</div>
 
-### Dependencies
+## Dependencies
 
-See requirements.txt
+See `requirements.txt`
 
-### Usage
+## Usage
 
 Clone the repository
 
@@ -55,7 +51,7 @@ options:
 
 Note: `--config` is required!!
 
-### Output
+## Output
 
 ```bash
 # docker run -it noisier --config config.json --log debug
@@ -85,6 +81,8 @@ Examples are available in [examples](/examples).
 
 ## Authors and Acknowledgments
 
+This project is based on the work of these authors:
+
 * **[Itay Hury](https://github.com/1tayH)** - *Initial work*
 * **[madereddy](https://github.com/madereddy/noisy)** - *Docker build + Python Upgrade*
 
@@ -92,9 +90,9 @@ Examples are available in [examples](/examples).
 
 Other projects based on the original noisy, forks of noisy, and similar to noisy:
 
-* https://github.com/Arduous/noisy
-* https://github.com/fireneat/Noisy
-* https://github.com/ReconInfoSec/web-traffic-generator
+* <https://github.com/Arduous/noisy>
+* <https://github.com/fireneat/Noisy>
+* <https://github.com/ReconInfoSec/web-traffic-generator>
 
 ## License
 
