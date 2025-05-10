@@ -88,6 +88,10 @@ class Crawler(object):
         :param url: the url to visit
         :return: the response Requests object
         """
+
+        MAX_BYTES = 1024 * 1024
+        # MAX_BYTES = 100
+
         random_user_agent = random.choice(self._config["user_agents"])
         headers = {"user-agent": random_user_agent}
 
@@ -105,14 +109,30 @@ class Crawler(object):
         session.mount("https://", adapter)
 
         try:
-            response = session.get(url, headers=headers, timeout=3)
+            # response = session.get(url, headers=headers, timeout=3)
+            response = session.get(url, headers=headers, timeout=3, stream=True)
             response.raise_for_status()
 
+            total_downloaded = 0
+            content_chunks = []
+
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    total_downloaded += len(chunk)
+                    if total_downloaded > MAX_BYTES:
+                        logging.debug(f"Download limit exceeded for URL {url}. Skipping.")
+                        return None
+                    content_chunks.append(chunk)
+
+            full_content = b''.join(content_chunks)
+
             content_length = response.headers.get("Content-Length")
+
             if content_length is not None:
                 self.kbytes_transferred += int(content_length) / 1024
                 self.prom_kbytes_transferred.inc(int(content_length) / 1024)
 
+            response._content = full_content
             return response
 
         except requests.exceptions.HTTPError as e:
