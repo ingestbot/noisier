@@ -1,5 +1,7 @@
 FROM python:alpine
 
+RUN apk update && apk upgrade
+
 ENV NOISIER_CONFIG_JSON=config.json
 ENV NOISIER_LOG_LEVEL=info
 
