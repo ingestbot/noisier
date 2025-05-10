@@ -120,11 +120,13 @@ class Crawler(object):
                 if chunk:
                     total_downloaded += len(chunk)
                     if total_downloaded > MAX_BYTES:
-                        logging.debug(f"Download limit exceeded for URL {url}. Skipping.")
+                        logging.debug(
+                            f"Download limit exceeded for URL {url}. Skipping."
+                        )
                         return None
                     content_chunks.append(chunk)
 
-            full_content = b''.join(content_chunks)
+            full_content = b"".join(content_chunks)
 
             content_length = response.headers.get("Content-Length")
 
