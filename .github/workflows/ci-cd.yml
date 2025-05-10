@@ -82,7 +82,6 @@ jobs:
           output-format: table,sarif
           severity-cutoff: medium
 
-
       - name: Run the Docker container | capture logs | verify Successful Visits
         run: |
           container_id=$(docker run -d localbuild/testimage)
