@@ -1,4 +1,6 @@
-FROM python:alpine
+
+# FROM python:alpine
+FROM python:3.12-slim
 
 ENV NOISIER_CONFIG_JSON=config.json
 ENV NOISIER_LOG_LEVEL=info
