@@ -5,7 +5,8 @@ FROM python:3.12-slim
 ENV NOISIER_CONFIG_JSON=config.json
 ENV NOISIER_LOG_LEVEL=info
 
-RUN adduser -D -H noisier
+# RUN adduser -D -H noisier
+RUN useradd -m -s /bin/bash noisier
 RUN mkdir /app && chown noisier:noisier /app
 USER noisier
 
