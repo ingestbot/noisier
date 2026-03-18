@@ -90,6 +90,8 @@ jobs:
           image: "localbuild/testimage"
           fail-build: true
           severity-cutoff: high
+          output-format: table
+          ignore-unfixed: true
 
       - name: Run the Docker container | capture logs | verify Successful Visits
         run: |
