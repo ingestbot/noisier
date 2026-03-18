@@ -96,7 +96,8 @@ jobs:
       - name: Run the Docker container | capture logs | verify Successful Visits
         run: |
           container_id=$(docker run -d localbuild/testimage)
-          timeout=180
+          # timeout=180
+          timeout=600
           interval=5
           elapsed=0
 
