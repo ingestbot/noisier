@@ -6,17 +6,16 @@ on:
   pull_request:
     branches: [main]
 
-permissions: read-all
+permissions:
+  contents: read
+  statuses: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    #    permissions:
-    #      contents: read
-    #      packages: read
-    #      # To report GitHub Actions status checks
-    #      # statuses: write
 
     env:
       DOCKER_USERNAME: ingestbot
@@ -60,6 +59,17 @@ jobs:
       #    VALIDATE_BIOME_LINT: false
       #
 
+      - name: Super-Linter
+        uses: super-linter/super-linter@v7.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # VALIDATE_JSCPD: false
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: super-linter-report
+          path: super-linter-output/
+
       - name: Run tests
         run: |
           source venv/bin/activate
@@ -83,6 +93,26 @@ jobs:
           tags: localbuild/testimage
           push: false
           load: true
+
+      - name: Scan container image with Trivy
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: "localbuild/testimage"
+          format: "table"
+          exit-code: "0"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "CRITICAL"
+
+      - name: Run Trivy and save report
+        run: |
+          trivy image --format table --severity CRITICAL --ignore-unfixed localbuild/testimage | tee trivy-report.txt
+
+      - name: Upload Trivy Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.txt
 
       - name: Anchore Container Scan
         uses: anchore/scan-action@v5.0.0
