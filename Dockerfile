@@ -8,8 +8,8 @@ ENV PATH="/app/venv/bin:${PATH}"
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        curl=8.3-1 \
-        procps=2.3.10-1 \
+        curl \
+        procps \
     && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd -g 1000 noisier && \
