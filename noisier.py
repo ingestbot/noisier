@@ -59,7 +59,6 @@ class Crawler(object):
         self.kbytes_transferred = 0
 
         # Prometheus Metrics
-        # self.request_time = Summary('crawler_request_processing_seconds', 'Time spent processing requests')
         self.prom_count_visit = Counter(
             "crawler_count_visit", "Total visits made by the crawler"
         )
@@ -70,10 +69,9 @@ class Crawler(object):
             "crawler_bad_url", "Total bad URLs encountered by the crawler"
         )
         self.prom_kbytes_transferred = Counter(
-            "crawler_kbytes_transferred", "Total Kilobytes transferred by the crawler"
+            "crawler_kbytes_transferred",
+            "Total Kilobytes transferred by the crawler",
         )
-
-        # self.crawl = time_it(self.request_time)(self.crawl)
 
     class CrawlerTimedOut(Exception):
         """
@@ -159,7 +157,10 @@ class Crawler(object):
 
         # '//' means keep the current protocol used to access this URL
         if link.startswith("//"):
-            return f"{parsed_root_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
+            return (
+                f"{parsed_root_url.scheme}://{parsed_url.netloc}"
+                f"{parsed_url.path}"
+            )
 
         # possibly a relative path
         if not parsed_url.scheme:
@@ -178,8 +179,10 @@ class Crawler(object):
         :return: boolean indicating whether the URL is valid or not
         """
         regex = re.compile(
-            r"^(?:http|ftp)s?://"  # http:// or https://
-            r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"  # domain...
+            r"^(?:http|ftp)s?://"
+            # domain...
+            r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+"
+            r"(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"
             r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
             r"(?::\d+)?"  # optional port
             r"(?:/?|[/?]\S+)$",
@@ -206,7 +209,11 @@ class Crawler(object):
         :return: boolean of whether or not the url should be accepted and
          potentially visited
         """
-        return url and self._is_valid_url(url) and not self._is_blacklisted(url)
+        return (
+            url
+            and self._is_valid_url(url)
+            and not self._is_blacklisted(url)
+        )
 
     def _extract_urls(self, body, root_url):
         """
@@ -216,7 +223,9 @@ class Crawler(object):
         :param root_url: the root URL of the given body
         :return: list of extracted links
         """
-        pattern = r"href=[\"'](?!#)(.*?)[\"'].*?"  # ignore links starting with #, no point in re-visiting the same page
+        # ignore links starting with ,
+        # no point in re-visiting the same page
+        pattern = r"href=[\"'](?!#)(.*?)[\"'].*?"
         urls = re.findall(pattern, str(body))
 
         normalize_urls = [self._normalize_link(url, root_url) for url in urls]
@@ -241,8 +250,9 @@ class Crawler(object):
         """
         Selects a random link out of the available link list and visits it.
         Blacklists any link that is not responsive or that contains no other
-        links. Please note that this function is recursive and will keep calling
-        itself until a dead end has reached or when we ran out of links
+        links. Please note that this function is recursive and will keep
+        calling itself until a dead end has reached or when we ran out of
+        links
         :param depth: our current link depth
         """
 
@@ -250,7 +260,8 @@ class Crawler(object):
 
         if not len(self._links) or is_depth_reached:
             logging.debug("Hit a dead end, moving to the next root URL")
-            # escape from the recursion, we don't have links to continue or we have reached the max depth
+            # escape from the recursion, we don't have links to continue or we
+            # have reached the max depth
             return
 
         if self._is_timeout_reached():
@@ -271,7 +282,9 @@ class Crawler(object):
             logging.debug(f"Response: {response}")
 
             if response is None:
-                logging.debug(f"Skipping {random_link} due to " "request failure.")
+                logging.debug(
+                    f"Skipping {random_link} due to "
+                    "request failure.")
                 self.count_bad_url += 1
                 self.prom_count_bad_url.inc()
 
@@ -288,11 +301,13 @@ class Crawler(object):
                 logging.info(f"Successful Visits: {self.count_visit}")
                 logging.info(f"Errors: {self.count_error}")
                 logging.info(f"Invalid URLs: {self.count_bad_url}")
-                logging.info(f"Total KBytes Transferred: {self.kbytes_transferred:.2f}")
+                logging.info(
+                    f"Total KBytes Transferred: {self.kbytes_transferred:.2f}")
 
             time.sleep(
-                random.randrange(self._config["min_sleep"], self._config["max_sleep"])
-            )
+                random.randrange(
+                    self._config["min_sleep"],
+                    self._config["max_sleep"]))
 
             # make sure we have more than 1 link to pick from
             if len(sub_links) > 1:
@@ -397,7 +412,8 @@ class Crawler(object):
                 body = response.content
 
                 self._links = self._extract_urls(body, url)
-                logging.debug(f"URL is good: {url}. Found {len(self._links)} links.")
+                logging.debug(
+                    f"URL is good: {url}. Found {len(self._links)} links.")
 
                 self._browse_from_links()
 
@@ -408,13 +424,14 @@ class Crawler(object):
 
             except MemoryError:
                 logging.warning(
-                    "Error: content at url: {} is exhausting the memory".format(url)
-                )
+                    "Error: content at url: {} is exhausting "
+                    "the memory".format(url))
                 self.count_error += 1
                 self.prom_count_error.inc()
 
             except LocationParseError:
-                logging.warning("Error encountered during parsing of: {}".format(url))
+                logging.warning(
+                    "Error encountered during parsing of: {}".format(url))
                 self.count_error += 1
                 self.prom_count_error.inc()
 
@@ -425,7 +442,11 @@ class Crawler(object):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--prom_port", metavar="-p", type=int, help="prometheus port")
+    parser.add_argument(
+        "--prom_port",
+        metavar="-p",
+        type=int,
+        help="prometheus port")
     parser.add_argument(
         "--log", metavar="-l", type=str, help="logging level", default="info"
     )
