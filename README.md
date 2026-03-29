@@ -1,6 +1,8 @@
 <div align="center">
   <img src="./noisier_mascot.jpg" width="234" alt="noisier mascot"/>
 
+asdf
+
 # Noisier
 
   A simple random DNS, HTTP/S internet traffic noise generator.
