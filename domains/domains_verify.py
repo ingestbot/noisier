@@ -1,5 +1,6 @@
 import socket
 
+
 def is_valid_domain(domain):
     try:
         socket.gethostbyname(domain)
@@ -7,10 +8,11 @@ def is_valid_domain(domain):
     except socket.gaierror:
         return False
 
+
 def check_domains(file_path):
     invalid_domains = []
 
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         domains = [line.strip() for line in f if line.strip()]
 
     for domain in domains:
@@ -21,6 +23,7 @@ def check_domains(file_path):
     print("\nSummary:")
     print(f"Total checked: {len(domains)}")
     print(f"Invalid domains: {len(invalid_domains)}")
+
 
 if __name__ == "__main__":
     check_domains("domains_all")

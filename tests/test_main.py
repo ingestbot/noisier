@@ -7,7 +7,12 @@ import pytest
 import requests
 from noisier import Crawler
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(
+    0,
+    os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            "..")))
 
 
 @pytest.fixture(scope="session")
@@ -49,7 +54,9 @@ def test_request_http_error(mock_session, crawler):
     """Test the _request method for an HTTP error response."""
     mock_response = MagicMock()
     mock_response.status_code = 503
-    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError()
+    mock_response.raise_for_status.side_effect = (
+        requests.exceptions.HTTPError()
+    )
 
     mock_session.return_value.get.return_value = mock_response
 
@@ -63,8 +70,9 @@ def test_request_http_error(mock_session, crawler):
 @patch("noisier.requests.Session")
 def test_request_timeout(mock_session, crawler):
     """Test the _request method for a read timeout exception."""
-    mock_session.return_value.get.side_effect = requests.exceptions.ReadTimeout()
-
+    mock_session.return_value.get.side_effect = (
+        requests.exceptions.ReadTimeout()
+    )
     crawler.count_error = 0
 
     url = "http://example.com"
@@ -109,7 +117,9 @@ def test_browse_from_links_invalid_url(mock_session, crawler):
 
     mock_response = MagicMock()
     mock_response.status_code = 404
-    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError()
+    mock_response.raise_for_status.side_effect = (
+        requests.exceptions.HTTPError()
+    )
     mock_session.return_value.get.return_value = mock_response
 
     crawler._browse_from_links()
