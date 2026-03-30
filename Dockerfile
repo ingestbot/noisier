@@ -6,6 +6,7 @@ ENV NOISIER_CONFIG_JSON=config.json
 ENV NOISIER_LOG_LEVEL=info
 ENV PATH="/app/venv/bin:${PATH}"
 
+# hadolint ignore=DL3008,DL4006
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         curl \

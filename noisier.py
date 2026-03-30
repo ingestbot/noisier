@@ -158,8 +158,7 @@ class Crawler(object):
         # '//' means keep the current protocol used to access this URL
         if link.startswith("//"):
             return (
-                f"{parsed_root_url.scheme}://{parsed_url.netloc}"
-                f"{parsed_url.path}"
+                f"{parsed_root_url.scheme}://{parsed_url.netloc}" f"{parsed_url.path}"
             )
 
         # possibly a relative path
@@ -209,11 +208,7 @@ class Crawler(object):
         :return: boolean of whether or not the url should be accepted and
          potentially visited
         """
-        return (
-            url
-            and self._is_valid_url(url)
-            and not self._is_blacklisted(url)
-        )
+        return url and self._is_valid_url(url) and not self._is_blacklisted(url)
 
     def _extract_urls(self, body, root_url):
         """
@@ -282,9 +277,7 @@ class Crawler(object):
             logging.debug(f"Response: {response}")
 
             if response is None:
-                logging.debug(
-                    f"Skipping {random_link} due to "
-                    "request failure.")
+                logging.debug(f"Skipping {random_link} due to " "request failure.")
                 self.count_bad_url += 1
                 self.prom_count_bad_url.inc()
 
@@ -301,13 +294,11 @@ class Crawler(object):
                 logging.info(f"Successful Visits: {self.count_visit}")
                 logging.info(f"Errors: {self.count_error}")
                 logging.info(f"Invalid URLs: {self.count_bad_url}")
-                logging.info(
-                    f"Total KBytes Transferred: {self.kbytes_transferred:.2f}")
+                logging.info(f"Total KBytes Transferred: {self.kbytes_transferred:.2f}")
 
             time.sleep(
-                random.randrange(
-                    self._config["min_sleep"],
-                    self._config["max_sleep"]))
+                random.randrange(self._config["min_sleep"], self._config["max_sleep"])
+            )
 
             # make sure we have more than 1 link to pick from
             if len(sub_links) > 1:
@@ -412,8 +403,7 @@ class Crawler(object):
                 body = response.content
 
                 self._links = self._extract_urls(body, url)
-                logging.debug(
-                    f"URL is good: {url}. Found {len(self._links)} links.")
+                logging.debug(f"URL is good: {url}. Found {len(self._links)} links.")
 
                 self._browse_from_links()
 
@@ -424,14 +414,13 @@ class Crawler(object):
 
             except MemoryError:
                 logging.warning(
-                    "Error: content at url: {} is exhausting "
-                    "the memory".format(url))
+                    "Error: content at url: {} is exhausting " "the memory".format(url)
+                )
                 self.count_error += 1
                 self.prom_count_error.inc()
 
             except LocationParseError:
-                logging.warning(
-                    "Error encountered during parsing of: {}".format(url))
+                logging.warning("Error encountered during parsing of: {}".format(url))
                 self.count_error += 1
                 self.prom_count_error.inc()
 
@@ -442,11 +431,7 @@ class Crawler(object):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--prom_port",
-        metavar="-p",
-        type=int,
-        help="prometheus port")
+    parser.add_argument("--prom_port", metavar="-p", type=int, help="prometheus port")
     parser.add_argument(
         "--log", metavar="-l", type=str, help="logging level", default="info"
     )
