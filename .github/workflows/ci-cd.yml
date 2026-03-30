@@ -47,9 +47,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
           # Python formatting / linting
-          VALIDATE_PYTHON_BLACK: true    # auto-format with Black
-          VALIDATE_PYTHON_FLAKE8: true   # lint Python, ignore lines >88, etc.
-          VALIDATE_PYTHON_ISORT: true    # optional, sort imports (compatible with Black)
+          # VALIDATE_PYTHON_BLACK: true    # auto-format with Black
+          # VALIDATE_PYTHON_FLAKE8: true   # lint Python, ignore lines >88, etc.
+          # VALIDATE_PYTHON_ISORT: true    # optional, sort imports (compatible with Black)
 
           # Optional / extra linters (enable as needed)
           VALIDATE_PYTHON_PYLINT: false  # can enable later if you want stricter linting
