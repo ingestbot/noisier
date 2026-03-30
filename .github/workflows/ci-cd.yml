@@ -52,18 +52,20 @@ jobs:
           # VALIDATE_PYTHON_ISORT: true    # optional, sort imports (compatible with Black)
 
           # Optional / extra linters (enable as needed)
-          VALIDATE_PYTHON_PYLINT: false  # can enable later if you want stricter linting
+          VALIDATE_PYTHON_PYLINT: false # can enable later if you want stricter linting
           VALIDATE_PYTHON_PYINK: false
 
           # VALIDATE_PYTHON_RUFF_FORMAT: false
 
           # JS / markdown / other linters
           VALIDATE_SPELL_CODESPELL: false
+          VALIDATE_BIOME_LINT: false
 
           # VALIDATE_JSCPD: false
           # VALIDATE_BIOME_FORMAT: false
-          # VALIDATE_BIOME_LINT: false
           # VALIDATE_DOCKERFILE_HADOLINT: false
+
+          VALIDATE_GITHUB_ACTIONS_ZIZMOR: false
 
       - uses: actions/upload-artifact@v4
         with:

@@ -1,5 +1,13 @@
 {
-	"ignore": ["**/venv/**"],
-	"minLines": 5,
-	"minTokens": 50
+  "ignore": [
+    "venv/**",
+    ".venv/**",
+    ".git/**",
+    "node_modules/**",
+    "dist/**",
+    "build/**"
+  ],
+  "minLines": 5,
+  "minTokens": 50,
+  "skipBinary": true
 }
