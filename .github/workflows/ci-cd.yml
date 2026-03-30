@@ -42,21 +42,28 @@ jobs:
         uses: trufflesecurity/trufflehog@v3.82.8
 
       - name: Super-Linter
-        # uses: super-linter/super-linter@v8.5.0
-        uses: super-linter/super-linter@v7.1.0
+        uses: super-linter/super-linter@v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_PYTHON_PYLINT: false
-          VALIDATE_JSCPD: false
-          VALIDATE_PYTHON_BLACK: false
-          VALIDATE_PYTHON_FLAKE8: false
-          VALIDATE_PYTHON_ISORT: false
-          VALIDATE_BIOME_FORMAT: false
-          VALIDATE_BIOME_LINT: false
-          VALIDATE_PYTHON_RUFF_FORMAT: false
-          VALIDATE_SPELL_CODESPELL: false
+
+          # Python formatting / linting
+          VALIDATE_PYTHON_BLACK: true    # auto-format with Black
+          VALIDATE_PYTHON_FLAKE8: true   # lint Python, ignore lines >88, etc.
+          VALIDATE_PYTHON_ISORT: true    # optional, sort imports (compatible with Black)
+
+          # Optional / extra linters (enable as needed)
+          VALIDATE_PYTHON_PYLINT: false  # can enable later if you want stricter linting
           VALIDATE_PYTHON_PYINK: false
-          VALIDATE_DOCKERFILE_HADOLINT: false
+
+          # VALIDATE_PYTHON_RUFF_FORMAT: false
+
+          # JS / markdown / other linters
+          VALIDATE_SPELL_CODESPELL: false
+
+          # VALIDATE_JSCPD: false
+          # VALIDATE_BIOME_FORMAT: false
+          # VALIDATE_BIOME_LINT: false
+          # VALIDATE_DOCKERFILE_HADOLINT: false
 
       - uses: actions/upload-artifact@v4
         with:
