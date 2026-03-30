@@ -55,7 +55,7 @@ jobs:
           VALIDATE_PYTHON_PYLINT: false # can enable later if you want stricter linting
           VALIDATE_PYTHON_PYINK: false
 
-          # VALIDATE_PYTHON_RUFF_FORMAT: false
+          VALIDATE_PYTHON_RUFF_FORMAT: false
 
           # JS / markdown / other linters
           VALIDATE_SPELL_CODESPELL: false
