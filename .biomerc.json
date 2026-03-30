@@ -1,0 +1,15 @@
+{
+  "exclude": [
+    "venv/**",
+    ".venv/**",
+    "__pycache__/**",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    ".jscpd.json",
+    ".markdownlint.json"
+  ],
+  "formatter": {
+    "lineLength": 120
+  }
+}
