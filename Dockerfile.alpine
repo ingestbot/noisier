@@ -25,7 +25,7 @@ ENV PATH="/app/venv/bin:${PATH}"
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY noisier.py .
-COPY config.json . 
+COPY config.json .
 
 ENTRYPOINT ["sh", "-c"]
 

@@ -9,27 +9,19 @@ import socket
 import time
 from urllib.parse import urljoin, urlparse
 
-# import functools
 import requests
 import requests.exceptions
 
-#
 # https://prometheus.github.io/client_python/
-#
-# from prometheus_client import start_http_server, Summary, Counter
 from prometheus_client import Counter, start_http_server
 
-#
 # See Crawler._request(): https://stackoverflow.com/q/23013220
-#
 from requests.adapters import HTTPAdapter
 from urllib3.exceptions import LocationParseError
 from urllib3.util.retry import Retry
 
-#
 # This prevents WARNING messages from urllib3 appearing in
 # default INFO logging.
-#
 logging.getLogger("urllib3").setLevel(logging.ERROR)
 
 """
@@ -45,7 +37,6 @@ def time_it(metric):
 
 
 class Crawler(object):
-
     def __init__(self):
         """
         Initializes the Crawl class
@@ -157,9 +148,7 @@ class Crawler(object):
 
         # '//' means keep the current protocol used to access this URL
         if link.startswith("//"):
-            return (
-                f"{parsed_root_url.scheme}://{parsed_url.netloc}" f"{parsed_url.path}"
-            )
+            return f"{parsed_root_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
 
         # possibly a relative path
         if not parsed_url.scheme:
@@ -277,7 +266,7 @@ class Crawler(object):
             logging.debug(f"Response: {response}")
 
             if response is None:
-                logging.debug(f"Skipping {random_link} due to " "request failure.")
+                logging.debug(f"Skipping {random_link} due to request failure.")
                 self.count_bad_url += 1
                 self.prom_count_bad_url.inc()
 
@@ -414,7 +403,7 @@ class Crawler(object):
 
             except MemoryError:
                 logging.warning(
-                    "Error: content at url: {} is exhausting " "the memory".format(url)
+                    "Error: content at url: {} is exhausting the memory".format(url)
                 )
                 self.count_error += 1
                 self.prom_count_error.inc()
