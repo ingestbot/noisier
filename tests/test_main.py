@@ -13,7 +13,7 @@ from noisier import Crawler
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def crawler():
     """Fixture to create a Crawler instance with a mock configuration."""
     mock_session = MagicMock()
