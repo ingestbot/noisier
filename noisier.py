@@ -37,7 +37,7 @@ def time_it(metric):
 
 
 class Crawler(object):
-    def __init__(self):
+    def __init__(self, session=None):
         """
         Initializes the Crawl class
         """
@@ -49,18 +49,18 @@ class Crawler(object):
         self.count_bad_url = 0
         self.kbytes_transferred = 0
 
-        if not hasattr(self, "_session"):
-            self._session = requests.Session()
+        self._session = session or requests.Session()
 
-        retry = Retry(
-            total=3,
-            backoff_factor=1,
-            status_forcelist=[500, 502, 503, 504],
-            allowed_methods=["HEAD", "GET", "OPTIONS", "POST"],
-        )
-        adapter = HTTPAdapter(max_retries=retry)
-        self._session.mount("http://", adapter)
-        self._session.mount("https://", adapter)
+        if session is None:
+            retry = Retry(
+                total=3,
+                backoff_factor=1,
+                status_forcelist=[500, 502, 503, 504],
+                allowed_methods=["HEAD", "GET", "OPTIONS", "POST"],
+            )
+            adapter = HTTPAdapter(max_retries=retry)
+            self._session.mount("http://", adapter)
+            self._session.mount("https://", adapter)
 
         # Prometheus Metrics
         self.prom_count_visit = Counter(
