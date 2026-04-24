@@ -49,6 +49,18 @@ class Crawler(object):
         self.count_bad_url = 0
         self.kbytes_transferred = 0
 
+        self._session = requests.Session()
+
+        retry = Retry(
+            total=3,
+            backoff_factor=1,
+            status_forcelist=[500, 502, 503, 504],
+            allowed_methods=["HEAD", "GET", "OPTIONS", "POST"],
+        )
+        adapter = HTTPAdapter(max_retries=retry)
+        self._session.mount("http://", adapter)
+        self._session.mount("https://", adapter)
+
         # Prometheus Metrics
         self.prom_count_visit = Counter(
             "crawler_count_visit", "Total visits made by the crawler"
@@ -80,21 +92,10 @@ class Crawler(object):
         random_user_agent = random.choice(self._config["user_agents"])
         headers = {"user-agent": random_user_agent}
 
-        session = requests.Session()
-
-        retry = Retry(
-            total=3,
-            backoff_factor=1,
-            status_forcelist=[500, 502, 503, 504],
-            allowed_methods=["HEAD", "GET", "OPTIONS", "POST"],
-        )
-
-        adapter = HTTPAdapter(max_retries=retry)
-        session.mount("http://", adapter)
-        session.mount("https://", adapter)
+        response = self._session.get(url, headers=headers, timeout=3)
 
         try:
-            response = session.get(url, headers=headers, timeout=3)
+            response = self._session.get(url, headers=headers, timeout=3)
             response.raise_for_status()
 
             content_length = response.headers.get("Content-Length")
@@ -273,6 +274,8 @@ class Crawler(object):
                 return
 
             sub_page = response.content
+            response.close()
+            del response
 
             self.prom_count_visit.inc()
             self.count_visit += 1
@@ -291,7 +294,7 @@ class Crawler(object):
 
             # make sure we have more than 1 link to pick from
             if len(sub_links) > 1:
-                self._links = self._extract_urls(sub_page, random_link)
+                self._links = sub_links[:500]
             else:
                 # else retry with current link list
                 # remove the dead-end link from our list
@@ -390,8 +393,10 @@ class Crawler(object):
                     self.prom_count_bad_url.inc()
                     continue
                 body = response.content
+                response.close()
+                del response
 
-                self._links = self._extract_urls(body, url)
+                self._links = self._extract_urls(body, url)[:500]
                 logging.debug(f"URL is good: {url}. Found {len(self._links)} links.")
 
                 self._browse_from_links()
