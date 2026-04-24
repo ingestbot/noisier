@@ -49,7 +49,8 @@ class Crawler(object):
         self.count_bad_url = 0
         self.kbytes_transferred = 0
 
-        self._session = requests.Session()
+        if not hasattr(self, "_session"):
+            self._session = requests.Session()
 
         retry = Retry(
             total=3,
