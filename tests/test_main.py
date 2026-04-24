@@ -79,8 +79,14 @@ def test_request_timeout(crawler):
     # crawler, mock_session = crawler
     # mock_session.return_value.get.side_effect = requests.exceptions.ReadTimeout()
     # mock_session.get.side_effect = requests.exceptions.ReadTimeout()
-    crawler._session.get.return_value = None
-    crawler._session.get.side_effect = requests.exceptions.ReadTimeout()
+
+    # crawler._session.get.return_value = None
+    # crawler._session.get.side_effect = requests.exceptions.ReadTimeout()
+
+    mock_response = MagicMock()
+    mock_response.raise_for_status.side_effect = requests.exceptions.ReadTimeout()
+    crawler._session.get.return_value = mock_response
+
     crawler.count_error = 0
 
     url = "http://example.com"
@@ -95,8 +101,13 @@ def test_request_ssl_error(crawler):
     # crawler, mock_session = crawler
     # mock_session.return_value.get.side_effect = requests.exceptions.SSLError()
     # mock_session.get.side_effect = requests.exceptions.SSLError()
-    crawler._session.get.return_value = None
-    crawler._session.get.side_effect = requests.exceptions.SSLError()
+
+    # crawler._session.get.return_value = None
+    # crawler._session.get.side_effect = requests.exceptions.SSLError()
+
+    mock_response = MagicMock()
+    mock_response.raise_for_status.side_effect = requests.exceptions.SSLError()
+    crawler._session.get.return_value = mock_response
 
     crawler.count_error = 0
 
