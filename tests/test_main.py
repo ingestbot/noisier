@@ -2,7 +2,6 @@ import datetime
 import os
 import sys
 
-# from unittest.mock import MagicMock, patch
 from unittest.mock import MagicMock
 
 import pytest
@@ -28,19 +27,28 @@ def crawler():
         "blacklisted_urls": [],
         "timeout": 2,
     }
-    return crawler, mock_session
+    return crawler
+
+
+@pytest.fixture(autouse=True)
+def mock_session_reset(crawler):
+    crawler._session.get.reset_mock()
+    crawler._session.get.side_effect = None
+
+
+#    crawler._session.get.return_value = None
 
 
 def test_request_success(crawler):
     """Test the _request method for a successful response."""
-    crawler, mock_session = crawler
+    # crawler, mock_session = crawler
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.headers = {"Content-Length": "2048"}
     mock_response.content = b"Some content"
 
-    # mock_session.return_value.get.return_value = mock_response
-    mock_session.get.return_value = mock_response
+    # crawler._session.get.side_effect = None
+    crawler._session.get.return_value = mock_response
 
     url = "http://example.com"
     response = crawler._request(url)
@@ -51,13 +59,13 @@ def test_request_success(crawler):
 
 def test_request_http_error(crawler):
     """Test the _request method for an HTTP error response."""
-    crawler, mock_session = crawler
+    # crawler, mock_session = crawler
     mock_response = MagicMock()
     mock_response.status_code = 503
     mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError()
 
-    # mock_session.return_value.get.return_value = mock_response
-    mock_session.get.return_value = mock_response
+    # crawler._session.get.side_effect = None
+    crawler._session.get.return_value = mock_response
 
     url = "http://example.com"
     response = crawler._request(url)
@@ -68,9 +76,11 @@ def test_request_http_error(crawler):
 
 def test_request_timeout(crawler):
     """Test the _request method for a read timeout exception."""
-    crawler, mock_session = crawler
+    # crawler, mock_session = crawler
     # mock_session.return_value.get.side_effect = requests.exceptions.ReadTimeout()
-    mock_session.get.side_effect = requests.exceptions.ReadTimeout()
+    # mock_session.get.side_effect = requests.exceptions.ReadTimeout()
+    crawler._session.get.return_value = None
+    crawler._session.get.side_effect = requests.exceptions.ReadTimeout()
     crawler.count_error = 0
 
     url = "http://example.com"
@@ -82,9 +92,11 @@ def test_request_timeout(crawler):
 
 def test_request_ssl_error(crawler):
     """Test the _request method for an SSL error."""
-    crawler, mock_session = crawler
+    # crawler, mock_session = crawler
     # mock_session.return_value.get.side_effect = requests.exceptions.SSLError()
-    mock_session.get.side_effect = requests.exceptions.SSLError()
+    # mock_session.get.side_effect = requests.exceptions.SSLError()
+    crawler._session.get.return_value = None
+    crawler._session.get.side_effect = requests.exceptions.SSLError()
 
     crawler.count_error = 0
 
@@ -97,7 +109,7 @@ def test_request_ssl_error(crawler):
 
 def test_browse_from_links_no_links(crawler):
     """Test _browse_from_links when there are no links to browse."""
-    crawler, mock_session = crawler
+    # crawler, mock_session = crawler
     crawler._links = []  # No links available
     crawler.count_visit = 0  # Reset visit count
 
@@ -108,7 +120,7 @@ def test_browse_from_links_no_links(crawler):
 
 def test_browse_from_links_invalid_url(crawler):
     """Test _browse_from_links when encountering an invalid URL."""
-    crawler, mock_session = crawler
+    # crawler, mock_session = crawler
     crawler._links = ["http://invalid-url.com"]
 
     # Set a dummy start time for the crawler
@@ -117,8 +129,9 @@ def test_browse_from_links_invalid_url(crawler):
     mock_response = MagicMock()
     mock_response.status_code = 404
     mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError()
-    # mock_session.return_value.get.return_value = mock_response
-    mock_session.get.return_value = mock_response
+
+    # crawler._session.get.side_effect = None
+    crawler._session.get.return_value = mock_response
 
     crawler._browse_from_links()
 
