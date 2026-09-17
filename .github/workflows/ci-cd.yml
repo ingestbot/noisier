@@ -88,18 +88,17 @@ jobs:
       - name: Scan container image with Trivy
         uses: aquasecurity/trivy-action@0.35.0
         with:
+          scan-type: "image"
           image-ref: "localbuild/testimage"
           format: "table"
-          exit-code: "0"
+          output: "trivy-report.txt"
+          exit-code: "1"
           ignore-unfixed: true
           vuln-type: "os,library"
           severity: "CRITICAL"
 
-      - name: Run Trivy and save report
-        run: |
-          trivy image --format table --severity CRITICAL --ignore-unfixed localbuild/testimage | tee trivy-report.txt
-
       - name: Upload Trivy Report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: trivy-report
