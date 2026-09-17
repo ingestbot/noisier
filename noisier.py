@@ -232,6 +232,29 @@ class Crawler(object):
 
         del self._links[self._links.index(link)]
 
+    def _get_sleep_duration(self):
+        """Return a weighted random pause duration in seconds."""
+        sleep_ranges = self._config.get("sleep_ranges")
+
+        if sleep_ranges:
+            selection = random.random()
+            cumulative_probability = 0
+
+            for sleep_range in sleep_ranges:
+                cumulative_probability += sleep_range["probability"]
+
+                if selection < cumulative_probability:
+                    # randint is inclusive, so this produces 0-30 or 0-90.
+                    return random.randint(0, sleep_range["max"])
+
+            raise ValueError("sleep_ranges probabilities must sum to at least 1")
+
+        # Preserve compatibility with existing configurations.
+        return random.randrange(
+            self._config["min_sleep"],
+            self._config["max_sleep"],
+        )
+
     def _browse_from_links(self, depth=0):
         """
         Selects a random link out of the available link list and visits it.
@@ -289,9 +312,7 @@ class Crawler(object):
                 logging.info(f"Invalid URLs: {self.count_bad_url}")
                 logging.info(f"Total KBytes Transferred: {self.kbytes_transferred:.2f}")
 
-            time.sleep(
-                random.randrange(self._config["min_sleep"], self._config["max_sleep"])
-            )
+            time.sleep(self._get_sleep_duration())
 
             # make sure we have more than 1 link to pick from
             if len(sub_links) > 1:
