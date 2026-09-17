@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.12.14-slim-trixie
 
 SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 
@@ -8,6 +8,7 @@ ENV PATH="/app/venv/bin:${PATH}"
 
 # hadolint ignore=DL3008,DL4006
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
         curl \
         procps \
